@@ -54,7 +54,13 @@ def get_url(user_id, pbk, sid):
     return f"""vless://{user_id}@saveserf.com:443?type=tcp&security=reality&pbk={pbk}&fp=chrome&sni=google.com&sid={sid}&spx=%2F&flow=xtls-rprx-vision#freenetvpn-{user_id}"""
 
 
-def get_channels(path):
-    with open(path, encoding="ascii") as file:
-        channels = file.readlines()
-    return channels
+def get(path):
+    with open(path) as file:
+        result = file.readlines()
+    return result
+
+
+def save_id(user_id):
+    with open(r"C:\Users\89052\projects\vpn_bot\src\clients_ids.txt", "a") as file:
+        if str(user_id) + "\n" not in get(r"C:\Users\89052\projects\vpn_bot\src\clients_ids.txt"):
+            file.write(str(user_id) + "\n")

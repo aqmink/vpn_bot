@@ -1,7 +1,7 @@
 import asyncio
 
 from aiogram import Dispatcher, F
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 from aiogram.types import (
     Message,
     InlineKeyboardMarkup,
@@ -13,11 +13,47 @@ from aiogram.types import (
 from aiogram.utils.formatting import Text, Pre
 
 from client import APIClient
-from script import get_url, get_channels
+from script import get_url, get, save_id
 
 dp = Dispatcher()
 
 client = APIClient()
+
+
+@dp.message(Command("show"))
+async def show(message: Message):
+    if message.from_user.id == 1485867091:
+        while True:
+            await asyncio.sleep(5)
+            for user_id in get(r"C:\Users\89052\projects\vpn_bot\src\clients_ids.txt"):
+                flag = True
+                for channel in get(r"C:\Users\89052\projects\vpn_bot\src\channels_list.txt"):
+                    if (await message.bot.get_chat_member(channel, user_id)).status not in ["member", "creator", "administrator"]:
+                        flag = False
+                if not flag:
+                    await client.update_client(int(user_id), False)
+                    await message.bot.send_message(
+                        chat_id=int(user_id),
+                        text="Перепроверьте ваши подписки",
+                        reply_markup=InlineKeyboardMarkup(
+                            inline_keyboard=[
+                                [
+                                    InlineKeyboardButton(
+                                        text="✅ Проверить",
+                                        callback_data="check",
+                                    ),
+                                ]   
+                            ],
+                        )
+                    )
+
+
+@dp.message(Command("post"))
+async def post(message: Message):
+    if message.chat.id == -4971478443:
+        for user_id in get(r"C:\Users\89052\projects\vpn_bot\src\clients_ids.txt"):
+            await message.bot.send_message(int(user_id), message.text[6:])
+        await message.answer("Рассылка прошла успешно")
 
 
 @dp.message(CommandStart())
@@ -26,6 +62,7 @@ async def hello(message: Message):
     #     url="https://exa-pizza.ru/files/products/pomidor.1800x1200.png",
     #     filename="python-logo.png"
     # )
+    save_id(message.from_user.id)
     await message.answer(
         text="🆓FREE INTERNET🆓\n\nВы попали в VPN, который предлагает услуги платных сервисов, за БЕСПЛАТНО.\n\nНО надо выполнить одно простое условие:\n\n🔵Подписаться на ниже перечисленные телеграмм каналы. И сразу после этого вы получите доступ автоматически\n\n🔥 Наши серверы не имеют ограничений по скорости и трафику, работает на всех устройствах, платформах и приложениях.\n\n🔐 Максимальная анонимность и безопасность, которую не даст ни один сервис в мире.\n\n🚀 Получите доступ в открытый Интернет без ограничений!\n\n🤗НИЖЕ, ТЕЛЕГРАММ КАНАЛЫ НА КОТОРЫЕ НУЖНО ПОДПИСАТЬСЯ:\n\n 👉 @freeimternet",
         reply_markup=InlineKeyboardMarkup(
@@ -33,7 +70,7 @@ async def hello(message: Message):
                 [
                     InlineKeyboardButton(
                         text="👥️ О сервисе",
-                        callback_data="about1"
+                        callback_data="about"
                     ),
                     InlineKeyboardButton(
                         text="✅ Проверить",
@@ -43,35 +80,14 @@ async def hello(message: Message):
             ],
         )
     )
-    while True:
-        user_id = message.from_user.id
-        await asyncio.sleep(12 * 3600)
-        flag = True
-        for channel in get_channels(r"C:\Users\89052\projects\vpn_bot\src\channels_list.txt"):
-            if (await message.bot.get_chat_member(channel, user_id)).status not in ["member", "creator", "administrator"]:
-                flag = False
-        if not flag: #Измени на проде!!!
-            await client.update_client(user_id, False)
-            await message.answer(
-                text="Перепроверьте ваши подписки",
-                reply_markup=InlineKeyboardMarkup(
-                    inline_keyboard=[
-                        [
-                            InlineKeyboardButton(
-                                text="✅ Проверить",
-                                callback_data="check",
-                            ),
-                        ]   
-                    ],
-                )
-            )
+    
 
 
 @dp.callback_query(F.data == "check")
 async def check(callback_query: CallbackQuery):
     user_id = callback_query.from_user.id
     flag = True
-    for channel in get_channels(r"C:\Users\89052\projects\vpn_bot\src\channels_list.txt"):
+    for channel in get(r"C:\Users\89052\projects\vpn_bot\src\channels_list.txt"):
         if (await callback_query.bot.get_chat_member(channel, user_id)).status not in ["member", "creator", "administrator"]:
             flag = False
     if flag: #Измени на проде!!!
@@ -132,7 +148,7 @@ async def check(callback_query: CallbackQuery):
 async def check(callback_query: CallbackQuery):
     user_id = callback_query.from_user.id
     flag = True
-    for channel in get_channels(r"C:\Users\89052\projects\vpn_bot\src\channels_list.txt"):
+    for channel in get(r"C:\Users\89052\projects\vpn_bot\src\channels_list.txt"):
         if (await callback_query.bot.get_chat_member(channel, user_id)).status not in ["member", "creator", "administrator"]:
             flag = False
     if flag: #Измени на проде!!!
@@ -253,28 +269,17 @@ async def access(callback_query: CallbackQuery):
 @dp.callback_query(F.data == "about")
 async def access(callback_query: CallbackQuery):
     await callback_query.message.edit_text(
-        text="йо, в разработке...",
-        reply_markup=InlineKeyboardMarkup(
-            inline_keyboard=[[
+        text="🚀 Сервис использует протокол VLESS, который обеспечивает максимальную безопасность и анонимность.\n\n🌍 Сервер расположен в Германии и автоматически маскируется под локальные сервисы. Это исключает возможность определить Ваше местоположение.\n\n💡 Оставайтесь защищёнными и наслаждайтесь свободой интернета!",
+        inline_keyboard=[
+            [
                 InlineKeyboardButton(
                     text="🔙 Назад", callback_data="back1"
-                )
-            ]]
-        )
-    )
-
-
-@dp.callback_query(F.data == "about1")
-async def access(callback_query: CallbackQuery):
-    await callback_query.message.edit_text(
-        text="йо, в разработке...",
-        reply_markup=InlineKeyboardMarkup(
-            inline_keyboard=[[
+                ),
                 InlineKeyboardButton(
-                    text="🔙 Назад", callback_data="back"
-                )
-            ]]
-        )
+                    text="📄 Правила", web_app=WebAppInfo(url="https://telegra.ph/Freeinternet-09-25")
+                ),
+            ]
+        ]
     )
 
 
