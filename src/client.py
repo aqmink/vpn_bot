@@ -29,6 +29,7 @@ class APIClient():
             f"/panel/api/inbounds/updateClient/{user_id}",
             data={
                 "id": 6,
+
                 "settings": settings,
             }
         )

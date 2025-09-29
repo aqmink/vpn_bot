@@ -6,14 +6,23 @@ from aiogram.types import (
     Message,
     InlineKeyboardMarkup,
     InlineKeyboardButton,
-    URLInputFile,
     CallbackQuery,
     WebAppInfo,
 )
 from aiogram.utils.formatting import Text, Pre
 
 from client import APIClient
-from script import get_url, get, save_id
+from script import (
+    get_url, 
+    get, 
+    save_id, 
+    get_text_1, 
+    get_text_2, 
+    get_text_3, 
+    get_text_4, 
+    get_text_5,
+    get_text_6,
+)
 
 dp = Dispatcher()
 
@@ -24,28 +33,32 @@ client = APIClient()
 async def show(message: Message):
     if message.from_user.id == 1485867091:
         while True:
-            await asyncio.sleep(5)
             for user_id in get(r"C:\Users\89052\projects\vpn_bot\src\clients_ids.txt"):
                 flag = True
-                for channel in get(r"C:\Users\89052\projects\vpn_bot\src\channels_list.txt"):
+                channels = get(r"C:\Users\89052\projects\vpn_bot\src\channels_list.txt")
+                for channel in channels:
                     if (await message.bot.get_chat_member(channel, user_id)).status not in ["member", "creator", "administrator"]:
                         flag = False
                 if not flag:
-                    await client.update_client(int(user_id), False)
-                    await message.bot.send_message(
-                        chat_id=int(user_id),
-                        text="Перепроверьте ваши подписки",
-                        reply_markup=InlineKeyboardMarkup(
-                            inline_keyboard=[
-                                [
-                                    InlineKeyboardButton(
-                                        text="✅ Проверить",
-                                        callback_data="check",
-                                    ),
-                                ]   
-                            ],
+                    try:
+                        await client.update_client(int(user_id), False)
+                        await message.bot.send_message(
+                            chat_id=int(user_id),
+                            text=get_text_5(channels),
+                            reply_markup=InlineKeyboardMarkup(
+                                inline_keyboard=[
+                                    [
+                                        InlineKeyboardButton(
+                                            text="✅ Проверить",
+                                            callback_data="check",
+                                        ),
+                                    ]   
+                                ],
+                            )
                         )
-                    )
+                    except:
+                        pass
+            await asyncio.sleep(12 * 3600)
 
 
 @dp.message(Command("post"))
@@ -58,13 +71,9 @@ async def post(message: Message):
 
 @dp.message(CommandStart())
 async def hello(message: Message):
-    # image = URLInputFile(
-    #     url="https://exa-pizza.ru/files/products/pomidor.1800x1200.png",
-    #     filename="python-logo.png"
-    # )
     save_id(message.from_user.id)
     await message.answer(
-        text="🆓FREE INTERNET🆓\n\nВы попали в VPN, который предлагает услуги платных сервисов, за БЕСПЛАТНО.\n\nНО надо выполнить одно простое условие:\n\n🔵Подписаться на ниже перечисленные телеграмм каналы. И сразу после этого вы получите доступ автоматически\n\n🔥 Наши серверы не имеют ограничений по скорости и трафику, работает на всех устройствах, платформах и приложениях.\n\n🔐 Максимальная анонимность и безопасность, которую не даст ни один сервис в мире.\n\n🚀 Получите доступ в открытый Интернет без ограничений!\n\n🤗НИЖЕ, ТЕЛЕГРАММ КАНАЛЫ НА КОТОРЫЕ НУЖНО ПОДПИСАТЬСЯ:\n\n 👉 @freeimternet",
+        text=get_text_1(get(r"C:\Users\89052\projects\vpn_bot\src\channels_list.txt")),
         reply_markup=InlineKeyboardMarkup(
             inline_keyboard=[
                 [
@@ -96,7 +105,7 @@ async def check(callback_query: CallbackQuery):
             await callback_query.bot.send_message(chat_id=-4971478443, text="ура, новый пользователь")
         await client.update_client(user_id, True)
         await callback_query.message.edit_text(
-            text="🏁Всё! вы получили ДОСТУП к нашему сервису.\n\n😎Теперь вы можете наслаждаться просмотром ваших любимых видео и фильмов.\n\n⬇️Ниже вы найдёте:⬇️\n\n🧑‍🏫Инструкцию по подключению.\n\n🛟Ссылку на поддержу, которой вы сможете задать все ваши вопросы.\n",
+            text=get_text_2(),
             reply_markup=InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
@@ -126,7 +135,7 @@ async def check(callback_query: CallbackQuery):
         if await client.get_client_by_email(f"freenet-vpn-{user_id}"):
             await client.update_client(user_id, False)
         await callback_query.message.edit_text(
-            text=f"Вы не подписались на все каналы",
+            text=get_text_3(get(r"C:\Users\89052\projects\vpn_bot\src\channels_list.txt")),
             reply_markup=InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
@@ -136,7 +145,7 @@ async def check(callback_query: CallbackQuery):
                         ),
                         InlineKeyboardButton(
                             text="🔙 Назад",
-                            callback_data="back"
+                            callback_data="back1"
                         ),
                     ]
                 ]
@@ -157,7 +166,7 @@ async def check(callback_query: CallbackQuery):
             await callback_query.bot.send_message(chat_id=-4971478443, text="ура, новый пользователь")
         await client.update_client(user_id, True)
         await callback_query.message.edit_text(
-            text="🏁Всё! вы получили ДОСТУП к нашему сервису.\n\n😎Теперь вы можете наслаждаться просмотром ваших любимых видео и фильмов.\n\n⬇️Ниже вы найдёте:⬇️\n\n🧑‍🏫Инструкцию по подключению.\n\n🛟Ссылку на поддержу, которой вы сможете задать все ваши вопросы.\n",
+            text=get_text_2(),
             reply_markup=InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
@@ -187,7 +196,7 @@ async def check(callback_query: CallbackQuery):
         if await client.get_client_by_email(f"freenet-vpn-{user_id}"):
             await client.update_client(user_id, False)
         await callback_query.message.edit_text(
-            text=f"Вы не подписались на все каналы",
+            text=get_text_3(get(r"C:\Users\89052\projects\vpn_bot\src\channels_list.txt")),
             reply_markup=InlineKeyboardMarkup(
                 inline_keyboard=[
                     [
@@ -197,7 +206,7 @@ async def check(callback_query: CallbackQuery):
                         ),
                         InlineKeyboardButton(
                             text="🔙 Назад",
-                            callback_data="back"
+                            callback_data="back1"
                         ),
                     ]
                 ]
@@ -212,7 +221,7 @@ async def access(callback_query: CallbackQuery):
     if user and user["\"enable\""] != "false,":
         await callback_query.message.edit_text(
             **Text(
-                f"✅ Ваш FREE INTERNET активирован! 🎉\n\nВаш ID: {user_id}\n\nКлюч и инструкция для подключения 👇\n", 
+                get_text_4(user_id), 
                 Pre(
                     f"{get_url(user_id, user['pbk'], user['sid'])}", 
                     language="copy")
@@ -269,24 +278,45 @@ async def access(callback_query: CallbackQuery):
 @dp.callback_query(F.data == "about")
 async def access(callback_query: CallbackQuery):
     await callback_query.message.edit_text(
-        text="🚀 Сервис использует протокол VLESS, который обеспечивает максимальную безопасность и анонимность.\n\n🌍 Сервер расположен в Германии и автоматически маскируется под локальные сервисы. Это исключает возможность определить Ваше местоположение.\n\n💡 Оставайтесь защищёнными и наслаждайтесь свободой интернета!",
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="🔙 Назад", callback_data="back1"
-                ),
-                InlineKeyboardButton(
-                    text="📄 Правила", web_app=WebAppInfo(url="https://telegra.ph/Freeinternet-09-25")
-                ),
+        text=get_text_6(),
+        reply_markup=InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="🔙 Назад", callback_data="back1"
+                    ),
+                    InlineKeyboardButton(
+                        text="📄 Правила", web_app=WebAppInfo(url="https://telegra.ph/Freeinternet-09-25")
+                    ),
+                ]
             ]
-        ]
+        )
+    )
+
+
+@dp.callback_query(F.data == "about1")
+async def access(callback_query: CallbackQuery):
+    await callback_query.message.edit_text(
+        text=get_text_6(),
+        reply_markup=InlineKeyboardMarkup(
+            inline_keyboard=[
+                [
+                    InlineKeyboardButton(
+                        text="🔙 Назад", callback_data="back"
+                    ),
+                    InlineKeyboardButton(
+                        text="📄 Правила", web_app=WebAppInfo(url="https://telegra.ph/Freeinternet-09-25")
+                    ),
+                ]
+            ]
+        )
     )
 
 
 @dp.callback_query(F.data == "back")
 async def hello(callback_query: CallbackQuery):
     await callback_query.message.edit_text(
-        text="🆓FREE INTERNET🆓\n\nВы попали в VPN, который предлагает услуги платных сервисов, за БЕСПЛАТНО.\n\nНО надо выполнить одно простое условие:\n\n🔵Подписаться на ниже перечисленные телеграмм каналы. И сразу после этого вы получите доступ автоматически\n\n🔥 Наши серверы не имеют ограничений по скорости и трафику, работает на всех устройствах, платформах и приложениях.\n\n🔐 Максимальная анонимность и безопасность, которую не даст ни один сервис в мире.\n\n🚀 Получите доступ в открытый Интернет без ограничений!\n\n🤗НИЖЕ, ТЕЛЕГРАММ КАНАЛЫ НА КОТОРЫЕ НУЖНО ПОДПИСАТЬСЯ:\n\n 👉 @freeimternet",
+        text=get_text_1(get(r"C:\Users\89052\projects\vpn_bot\src\channels_list.txt")),
         reply_markup=InlineKeyboardMarkup(
             inline_keyboard=[
                 [
@@ -317,7 +347,7 @@ async def hello(callback_query: CallbackQuery):
 @dp.callback_query(F.data == "back1")
 async def hello(callback_query: CallbackQuery):
     await callback_query.message.edit_text(
-        text="🆓FREE INTERNET🆓\n\nВы попали в VPN, который предлагает услуги платных сервисов, за БЕСПЛАТНО.\n\nНО надо выполнить одно простое условие:\n\n🔵Подписаться на ниже перечисленные телеграмм каналы. И сразу после этого вы получите доступ автоматически\n\n🔥 Наши серверы не имеют ограничений по скорости и трафику, работает на всех устройствах, платформах и приложениях.\n\n🔐 Максимальная анонимность и безопасность, которую не даст ни один сервис в мире.\n\n🚀 Получите доступ в открытый Интернет без ограничений!\n\n🤗НИЖЕ, ТЕЛЕГРАММ КАНАЛЫ НА КОТОРЫЕ НУЖНО ПОДПИСАТЬСЯ:\n",
+        text=get_text_1(get(r"C:\Users\89052\projects\vpn_bot\src\channels_list.txt")),
         reply_markup=InlineKeyboardMarkup(
             inline_keyboard=[
                 [
