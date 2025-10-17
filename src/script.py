@@ -1,3 +1,11 @@
+import random
+from string import ascii_letters, digits
+
+
+def get_sid():
+    return ''.join([random.choice(ascii_letters + digits) for _ in range(3, 10)])
+
+
 def from_data(data) -> dict[dict[str, int | None | str]]:
     data = data["obj"]
     result = {
@@ -39,6 +47,7 @@ def from_data(data) -> dict[dict[str, int | None | str]]:
             lst = v.split("\n")
             result["streamSettings"]["pbk"] = lst[28].split(":")[1].rstrip().lstrip()[1:-2]
             result["streamSettings"]["sid"] = lst[17].rstrip().lstrip()[1:-2]
+    print(result)
     return result
 
 

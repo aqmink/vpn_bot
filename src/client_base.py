@@ -5,7 +5,7 @@ from config import PANEL_USERNAME, PANEL_PASSWORD
 
 class BaseAPIServer:
     def __init__(self):
-        self.base_url = "https://saveserf.com:80/home"
+        self.base_url = "https://saveserf.com:8000/b2zBmwpgEuFJlOgBOl"
     
     async def get(self, url):
         async with ClientSession() as session:
